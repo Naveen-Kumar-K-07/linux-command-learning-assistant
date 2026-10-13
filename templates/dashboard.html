@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard — Linux Commands Learning Assistant{% endblock %}
+
+{% block content %}
+<!-- Welcome & Quick Resume Hero -->
+<div class="dashboard-hero">
+    <div class="hero-welcome">
+        <h1>Welcome, <span>{{ user.full_name }}</span>!</h1>
+        <p>Current Track: <strong>{{ overview.state.current_level }} Level</strong> &bull; Category: <strong>{{
+                overview.state.current_category }}</strong></p>
+    </div>
+
+    <div>
+        {% if overview.next_lesson %}
+        <a href="{{ url_for('learn.lesson_detail', slug=overview.next_lesson.lesson_slug) }}" class="btn btn-primary"
+            id="btn-resume-learning" style="padding: 0.85rem 1.5rem; font-size: 1rem;">
+            <i class="fas fa-play"></i> Continue Learning: {{ overview.next_lesson.command_name }}
+        </a>
+        {% else %}
+        <a href="{{ url_for('learn.index') }}" class="btn btn-primary" style="padding: 0.85rem 1.5rem;">
+            <i class="fas fa-book-open"></i> Browse All Lessons
+        </a>
+        {% endif %}
+    </div>
+</div>
+
+<!-- ===================================================================
+     EXACTLY FOUR MAIN NAVIGATION ICONS
+     =================================================================== -->
+<div style="margin-bottom: 1.5rem;">
+    <h2
+        style="font-size: 1.35rem; font-weight: 700; color: var(--text-sub); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+        <i class="fas fa-compass" style="color: var(--accent-emerald);"></i> Main Navigation
+    </h2>
+</div>
+
+<div class="dashboard-nav-grid" id="main-navigation-icons">
+    <!-- 1. Learn Navigation Card -->
+    <a href="{{ url_for('learn.index') }}" class="dash-nav-card card-learn" id="dash-nav-learn">
+        <div class="dash-nav-icon icon-learn">
+            <i class="fas fa-terminal"></i>
+        </div>
+        <div class="dash-nav-title">Learn</div>
+        <div class="dash-nav-desc">
+            Interactive command lessons, syntax guides, and simulated shell practice.
+        </div>
+    </a>
+
+    <!-- 2. Assessment Navigation Card -->
+    <a href="{{ url_for('assessment.index') }}" class="dash-nav-card card-assessment" id="dash-nav-assessment">
+        <div class="dash-nav-icon icon-assessment">
+            <i class="fas fa-tasks"></i>
+        </div>
+        <div class="dash-nav-title">Assessment</div>
+        <div class="dash-nav-desc">
+            Topic-wise quizzes, command syntax challenges, and practical scenario tests.
+        </div>
+    </a>
+
+    <!-- 3. Certification Navigation Card -->
+    <a href="{{ url_for('certificate.index') }}" class="dash-nav-card card-certification" id="dash-nav-certification">
+        <div class="dash-nav-icon icon-certification">
+            <i class="fas fa-award"></i>
+        </div>
+        <div class="dash-nav-title">Certification</div>
+        <div class="dash-nav-desc">
+            Track competency eligibility and generate official downloadable PDF certificates.
+        </div>
+    </a>
+
+    <!-- 4. Logout Navigation Card -->
+    <a href="{{ url_for('auth.logout') }}" class="dash-nav-card card-logout" id="dash-nav-logout">
+        <div class="dash-nav-icon icon-logout">
+            <i class="fas fa-sign-out-alt"></i>
+        </div>
+        <div class="dash-nav-title">Logout</div>
+        <div class="dash-nav-desc">
+            Securely terminate session while preserving all learning progress in database.
+        </div>
+    </a>
+</div>
+
+<!-- Progress Statistics & Summary (Information only, without additional main navigation icons) -->
+<div class="stats-container">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+        <div>
+            <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--text-main);">Overall Curriculum Progress</h3>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">
+                {{ overview.completed_count }} of {{ overview.total_lessons }} core Linux lessons completed
+            </p>
+        </div>
+        <div style="font-size: 1.5rem; font-weight: 800; color: var(--accent-emerald); font-family: var(--font-mono);">
+            {{ overview.completion_percentage }}%
+        </div>
+    </div>
+
+    <div class="progress-bar-wrapper">
+        <div class="progress-fill" data-progress="{{ overview.completion_percentage }}"></div>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-item">
+            <div class="stat-value" style="color: #34d399;">{{ overview.completed_count }}</div>
+            <div class="stat-label">Completed Lessons</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-value" style="color: #38bdf8;">{{ overview.total_lessons - overview.completed_count }}
+            </div>
+            <div class="stat-label">Remaining Lessons</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-value" style="color: #fbbf24;">{{ eligibility.passed_quizzes }} / {{
+                eligibility.total_quizzes }}</div>
+            <div class="stat-label">Assessments Passed</div>
+        </div>
+        <div class="stat-item">
+            {% if eligibility.existing_certificate %}
+                <div class="stat-value text-emerald">Issued</div>
+            {% elif eligibility.eligible %}
+                <div class="stat-value text-cyan">Unlocked</div>
+            {% else %}
+                <div class="stat-value text-muted-stat">Locked</div>
+            {% endif %}
+            <div class="stat-label">Certificate Status</div>
+        </div>
+    </div>
+</div>
+{% endblock %}

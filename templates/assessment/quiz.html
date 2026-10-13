@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block title %}Taking {{ quiz.title }} — Linux Commands Learning Assistant{% endblock %}
+
+{% block content %}
+<div style="max-width: 860px; margin: 0 auto;">
+    <!-- Top Quiz Bar -->
+    <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 1.5rem; margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+        <div>
+            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem;">
+                <span class="badge {% if quiz.difficulty_level == 'Beginner' %}badge-beginner{% elif quiz.difficulty_level == 'Intermediate' %}badge-intermediate{% else %}badge-advanced{% endif %}">
+                    {{ quiz.difficulty_level }}
+                </span>
+                <span style="font-size: 0.85rem; color: var(--text-muted);">Passing Score: {{ quiz.passing_score }}%</span>
+            </div>
+            <h1 style="font-size: 1.6rem; font-weight: 800; color: var(--text-main);">{{ quiz.title }}</h1>
+        </div>
+
+        <div style="text-align: right;">
+            <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.2rem;"><i class="fas fa-stopwatch"></i> Time Limit</div>
+            <div style="font-size: 1.25rem; font-weight: 700; color: var(--accent-cyan); font-family: var(--font-mono);">{{ quiz.time_limit_minutes }}:00</div>
+        </div>
+    </div>
+
+    <!-- Quiz Question Form -->
+    <form method="POST" action="{{ url_for('assessment.take_quiz', slug=quiz.slug) }}" id="quiz-form">
+        {% for q in questions %}
+        <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 2rem; margin-bottom: 1.75rem; box-shadow: var(--shadow-sm);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <span style="font-size: 0.85rem; font-weight: 700; color: var(--accent-emerald); text-transform: uppercase; letter-spacing: 0.05em;">
+                    Question {{ loop.index }} of {{ questions|length }}
+                </span>
+                <span class="badge" style="background: rgba(255,255,255,0.06); color: var(--text-muted);">
+                    Type: {{ q.question_type }}
+                </span>
+            </div>
+
+            <div style="font-size: 1.15rem; font-weight: 600; color: var(--text-main); line-height: 1.5; margin-bottom: 1.5rem;">
+                {{ q.question_text }}
+            </div>
+
+            <!-- Options Radio List -->
+            <div style="display: flex; flex-direction: column; gap: 0.85rem;">
+                <!-- Option A -->
+                <label style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 1rem 1.25rem; display: flex; align-items: center; gap: 1rem; cursor: pointer; transition: all 0.2s ease;">
+                    <input type="radio" name="question_{{ q.id }}" value="A" style="accent-color: var(--accent-emerald);" required>
+                    <span style="font-weight: 700; color: var(--accent-cyan); font-family: var(--font-mono); width: 20px;">A</span>
+                    <span style="color: var(--text-sub); font-size: 0.95rem;">{{ q.option_a }}</span>
+                </label>
+
+                <!-- Option B -->
+                <label style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 1rem 1.25rem; display: flex; align-items: center; gap: 1rem; cursor: pointer; transition: all 0.2s ease;">
+                    <input type="radio" name="question_{{ q.id }}" value="B" style="accent-color: var(--accent-emerald);">
+                    <span style="font-weight: 700; color: var(--accent-cyan); font-family: var(--font-mono); width: 20px;">B</span>
+                    <span style="color: var(--text-sub); font-size: 0.95rem;">{{ q.option_b }}</span>
+                </label>
+
+                <!-- Option C -->
+                <label style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 1rem 1.25rem; display: flex; align-items: center; gap: 1rem; cursor: pointer; transition: all 0.2s ease;">
+                    <input type="radio" name="question_{{ q.id }}" value="C" style="accent-color: var(--accent-emerald);">
+                    <span style="font-weight: 700; color: var(--accent-cyan); font-family: var(--font-mono); width: 20px;">C</span>
+                    <span style="color: var(--text-sub); font-size: 0.95rem;">{{ q.option_c }}</span>
+                </label>
+
+                <!-- Option D -->
+                <label style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 1rem 1.25rem; display: flex; align-items: center; gap: 1rem; cursor: pointer; transition: all 0.2s ease;">
+                    <input type="radio" name="question_{{ q.id }}" value="D" style="accent-color: var(--accent-emerald);">
+                    <span style="font-weight: 700; color: var(--accent-cyan); font-family: var(--font-mono); width: 20px;">D</span>
+                    <span style="color: var(--text-sub); font-size: 0.95rem;">{{ q.option_d }}</span>
+                </label>
+            </div>
+        </div>
+        {% endfor %}
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 2rem; margin-bottom: 4rem;">
+            <a href="{{ url_for('assessment.index') }}" class="btn btn-outline">
+                <i class="fas fa-times"></i> Cancel Assessment
+            </a>
+            <button type="submit" class="btn btn-primary" id="btn-submit-assessment" style="padding: 0.85rem 2.25rem; font-size: 1.05rem;">
+                <i class="fas fa-paper-plane"></i> Submit Answers & Calculate Score
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

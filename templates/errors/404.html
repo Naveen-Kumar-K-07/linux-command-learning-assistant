@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block title %}404 — Page Not Found | Linux Commands Learning Assistant{% endblock %}
+
+{% block content %}
+<div style="max-width: 540px; margin: 4rem auto; text-align: center;">
+    <div style="font-family: var(--font-mono); font-size: 5rem; font-weight: 800; color: var(--accent-rose); line-height: 1; margin-bottom: 1rem;">
+        404
+    </div>
+    <h1 style="font-size: 1.75rem; font-weight: 700; margin-bottom: 0.75rem;">Command or Path Not Found</h1>
+    <p style="color: var(--text-muted); font-size: 1rem; margin-bottom: 2rem;">
+        The requested virtual path does not exist in this environment.
+    </p>
+    <a href="{{ url_for('landing') }}" class="btn btn-primary">
+        <i class="fas fa-home"></i> Return to Safety
+    </a>
+</div>
+{% endblock %}

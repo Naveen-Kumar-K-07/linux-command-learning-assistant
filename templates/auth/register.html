@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}Create Account — Linux Commands Learning Assistant{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper">
+    <div class="auth-header">
+        <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(56, 189, 248, 0.15); color: #38bdf8; display: inline-flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-bottom: 0.75rem;">
+            <i class="fas fa-user-plus"></i>
+        </div>
+        <h2>Create Learner Account</h2>
+        <p>Register with your Gmail address to save your terminal progress</p>
+    </div>
+
+    <form method="POST" action="{{ url_for('auth.register') }}" id="register-form">
+        <div class="form-group">
+            <label for="full_name"><i class="fas fa-user"></i> Full Name</label>
+            <input type="text" id="full_name" name="full_name" class="form-control" placeholder="Linus Torvalds" value="{{ full_name or '' }}" required autofocus>
+        </div>
+
+        <div class="form-group">
+            <label for="email"><i class="fab fa-google"></i> Gmail Address</label>
+            <input type="email" id="email" name="email" class="form-control" placeholder="username@gmail.com" value="{{ email or '' }}" required>
+            <small style="color: var(--text-muted); font-size: 0.75rem; margin-top: 0.25rem; display: block;">Used for account verification and certificate issuance.</small>
+        </div>
+
+        <div class="form-group">
+            <label for="password"><i class="fas fa-lock"></i> Password</label>
+            <input type="password" id="password" name="password" class="form-control" placeholder="Minimum 6 characters" minlength="6" required>
+        </div>
+
+        <div class="form-group">
+            <label for="confirm_password"><i class="fas fa-check-double"></i> Confirm Password</label>
+            <input type="password" id="confirm_password" name="confirm_password" class="form-control" placeholder="Re-enter your password" minlength="6" required>
+            <div id="password-match-msg" style="font-size: 0.75rem; margin-top: 0.25rem; display: none;"></div>
+        </div>
+
+        <button type="submit" class="btn btn-primary" id="btn-register-submit" style="width: 100%; margin-top: 1rem; padding: 0.8rem;">
+            <i class="fas fa-user-check"></i> Create Account
+        </button>
+    </form>
+
+    <div class="auth-footer">
+        Already registered? <a href="{{ url_for('auth.login') }}" style="font-weight: 600;">Sign In</a>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const pwd = document.getElementById('password');
+    const confirm = document.getElementById('confirm_password');
+    const msg = document.getElementById('password-match-msg');
+
+    function checkMatch() {
+        if (!confirm.value) {
+            msg.style.display = 'none';
+            return;
+        }
+        msg.style.display = 'block';
+        if (pwd.value === confirm.value) {
+            msg.style.color = '#34d399';
+            msg.innerHTML = '<i class="fas fa-check"></i> Passwords match.';
+        } else {
+            msg.style.color = '#fb7185';
+            msg.innerHTML = '<i class="fas fa-times"></i> Passwords do not match.';
+        }
+    }
+
+    if (pwd && confirm) {
+        pwd.addEventListener('input', checkMatch);
+        confirm.addEventListener('input', checkMatch);
+    }
+});
+</script>
+{% endblock %}

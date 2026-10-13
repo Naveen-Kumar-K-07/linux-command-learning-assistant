@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block title %}Assessments & Quizzes — Linux Commands Learning Assistant{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 2.5rem;">
+    <h1 style="font-size: 2.25rem; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 0.5rem;">Assessments & Quizzes</h1>
+    <p style="color: var(--text-muted); font-size: 1rem;">Validate your practical command syntax, flag knowledge, and scenario problem-solving skills.</p>
+</div>
+
+<!-- Available Quizzes Grid -->
+<div style="margin-bottom: 3.5rem;">
+    <h2 style="font-size: 1.35rem; font-weight: 700; color: var(--text-sub); margin-bottom: 1.25rem; display: flex; align-items: center; gap: 0.5rem;">
+        <i class="fas fa-clipboard-list" style="color: var(--accent-cyan);"></i> Available Assessments
+    </h2>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem;">
+        {% for q in quizzes %}
+        {% set best = best_scores.get(q.id) %}
+        <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 1.75rem; display: flex; flex-direction: column; justify-content: space-between; transition: all 0.2s ease;">
+            <div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+                    <span class="badge {% if q.difficulty_level == 'Beginner' %}badge-beginner{% elif q.difficulty_level == 'Intermediate' %}badge-intermediate{% else %}badge-advanced{% endif %}">
+                        {{ q.difficulty_level }}
+                    </span>
+                    <span style="font-size: 0.8rem; color: var(--text-muted);">
+                        <i class="fas fa-clock"></i> {{ q.time_limit_minutes }} mins
+                    </span>
+                </div>
+
+                <h3 style="font-size: 1.2rem; font-weight: 700; color: var(--text-main); margin-bottom: 0.5rem;">{{ q.title }}</h3>
+                <p style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 1.25rem;">
+                    {{ q.description }}
+                </p>
+
+                <div style="display: flex; gap: 1rem; font-size: 0.85rem; color: var(--text-sub); margin-bottom: 1.25rem;">
+                    <div><i class="fas fa-question-circle" style="color: var(--accent-cyan);"></i> {{ q.questions.count() }} Questions</div>
+                    <div><i class="fas fa-bullseye" style="color: var(--accent-emerald);"></i> Pass: {{ q.passing_score }}%</div>
+                </div>
+
+                {% if best %}
+                <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 0.75rem 1rem; margin-bottom: 1.25rem; display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-size: 0.85rem; color: var(--text-muted);">Your Best Score:</span>
+                    <div>
+                        <strong class="{% if best.passed %}text-emerald{% else %}text-rose{% endif %}" style="font-family: var(--font-mono); font-size: 1rem;">
+                            {{ best.percentage }}%
+                        </strong>
+                        <span class="badge {% if best.passed %}badge-completed{% else %}badge-danger{% endif %}" style="margin-left: 0.5rem;">
+                            {{ 'PASSED' if best.passed else 'FAILED' }}
+                        </span>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            <div>
+                <a href="{{ url_for('assessment.take_quiz', slug=q.slug) }}" class="btn btn-primary" style="width: 100%;">
+                    <i class="fas fa-pen-fancy"></i> {% if best %}Retake Assessment{% else %}Start Assessment{% endif %}
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Attempt History Table -->
+<div>
+    <h2 style="font-size: 1.35rem; font-weight: 700; color: var(--text-sub); margin-bottom: 1.25rem; display: flex; align-items: center; gap: 0.5rem;">
+        <i class="fas fa-history" style="color: var(--accent-purple);"></i> Your Examination History
+    </h2>
+
+    {% if attempts %}
+    <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem;">
+            <thead>
+                <tr style="border-bottom: 1px solid var(--border-color); background: var(--bg-secondary); color: var(--text-muted);">
+                    <th style="padding: 1rem 1.25rem;">Assessment Title</th>
+                    <th style="padding: 1rem 1.25rem;">Score</th>
+                    <th style="padding: 1rem 1.25rem;">Percentage</th>
+                    <th style="padding: 1rem 1.25rem;">Result</th>
+                    <th style="padding: 1rem 1.25rem;">Attempt Date</th>
+                    <th style="padding: 1rem 1.25rem; text-align: right;">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for att in attempts %}
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                    <td style="padding: 1rem 1.25rem; font-weight: 600; color: var(--text-main);">{{ att.quiz.title }}</td>
+                    <td style="padding: 1rem 1.25rem; font-family: var(--font-mono);">{{ att.score }} / {{ att.total_questions }}</td>
+                    <td style="padding: 1rem 1.25rem; font-family: var(--font-mono); font-weight: 700;" class="{% if att.passed %}text-emerald{% else %}text-rose{% endif %}">{{ att.percentage }}%</td>
+                    <td style="padding: 1rem 1.25rem;">
+                        <span class="badge {% if att.passed %}badge-completed{% else %}badge-danger{% endif %}">
+                            {{ 'PASSED' if att.passed else 'FAILED' }}
+                        </span>
+                    </td>
+                    <td style="padding: 1rem 1.25rem; color: var(--text-muted);">{{ att.attempted_at.strftime('%b %d, %Y %H:%M') }}</td>
+                    <td style="padding: 1rem 1.25rem; text-align: right;">
+                        <a href="{{ url_for('assessment.result', attempt_id=att.id) }}" class="btn btn-outline" style="padding: 0.35rem 0.75rem; font-size: 0.8rem;">
+                            <i class="fas fa-eye"></i> Review
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 2.5rem; text-align: center; color: var(--text-muted);">
+        <i class="fas fa-clipboard-check" style="font-size: 2.5rem; color: #475569; margin-bottom: 1rem;"></i>
+        <p>No assessment attempts recorded yet. Select an assessment above to test your skills!</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

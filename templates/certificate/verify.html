@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block title %}Verify Certificate: {{ cert_id }} — Linux Commands Learning Assistant{% endblock %}
+
+{% block content %}
+<div style="max-width: 680px; margin: 3rem auto;">
+    {% if cert %}
+    <div style="background: var(--bg-card); border: 2px solid var(--accent-emerald); border-radius: var(--radius-lg); padding: 2.5rem; box-shadow: var(--shadow-lg); text-align: center;">
+        <div style="width: 64px; height: 64px; border-radius: 50%; background: rgba(16, 185, 129, 0.15); color: #34d399; display: inline-flex; align-items: center; justify-content: center; font-size: 2rem; margin-bottom: 1.25rem;">
+            <i class="fas fa-shield-alt"></i>
+        </div>
+
+        <span class="badge badge-completed" style="font-size: 0.9rem; padding: 0.35rem 0.85rem; margin-bottom: 1rem;">
+            <i class="fas fa-check"></i> OFFICIALLY VERIFIED
+        </span>
+
+        <h1 style="font-size: 1.85rem; font-weight: 800; color: var(--text-main); margin-bottom: 0.5rem;">
+            Certificate of Competency
+        </h1>
+        <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 2rem;">
+            This digital certificate was officially issued by Linux Commands Learning Assistant.
+        </p>
+
+        <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1.5rem; text-align: left; margin-bottom: 2rem;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; font-size: 0.95rem;">
+                <div>
+                    <span style="color: var(--text-muted); font-size: 0.8rem; display: block;">Recipient Student:</span>
+                    <strong style="color: #fff; font-size: 1.1rem;">{{ cert.user.full_name }}</strong>
+                </div>
+                <div>
+                    <span style="color: var(--text-muted); font-size: 0.8rem; display: block;">Certificate ID:</span>
+                    <strong style="color: #38bdf8; font-family: var(--font-mono);">{{ cert.certificate_id }}</strong>
+                </div>
+                <div>
+                    <span style="color: var(--text-muted); font-size: 0.8rem; display: block;">Course Title:</span>
+                    <strong style="color: #cbd5e1;">{{ cert.course_name }}</strong>
+                </div>
+                <div>
+                    <span style="color: var(--text-muted); font-size: 0.8rem; display: block;">Issue Date:</span>
+                    <strong style="color: #cbd5e1;">{{ cert.issue_date.strftime('%B %d, %Y') }}</strong>
+                </div>
+            </div>
+
+            <div style="margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.06);">
+                <span style="color: var(--text-muted); font-size: 0.75rem; display: block;">Cryptographic Verification Hash:</span>
+                <code style="font-size: 0.75rem; color: #64748b; word-break: break-all;">{{ cert.verification_hash }}</code>
+            </div>
+        </div>
+
+        <div style="font-size: 0.85rem; color: var(--text-muted);">
+            Linux Commands Learning Assistant &bull; Accredited Interactive Assessment Engine
+        </div>
+    </div>
+    {% else %}
+    <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 3rem; text-align: center;">
+        <div style="width: 64px; height: 64px; border-radius: 50%; background: rgba(244, 63, 94, 0.15); color: #fb7185; display: inline-flex; align-items: center; justify-content: center; font-size: 2rem; margin-bottom: 1.25rem;">
+            <i class="fas fa-times-circle"></i>
+        </div>
+        <h1 style="font-size: 1.75rem; font-weight: 800; color: var(--text-main); margin-bottom: 0.5rem;">
+            Certificate Not Found
+        </h1>
+        <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.5rem;">
+            No certificate found matching ID: <code>{{ cert_id }}</code>. Please verify the ID for typos.
+        </p>
+        <a href="{{ url_for('landing') }}" class="btn btn-outline">
+            <i class="fas fa-home"></i> Go to Homepage
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

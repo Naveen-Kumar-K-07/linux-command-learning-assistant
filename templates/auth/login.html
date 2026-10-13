@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}Sign In — Linux Commands Learning Assistant{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper">
+    <div class="auth-header">
+        <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(16, 185, 129, 0.15); color: #10b981; display: inline-flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-bottom: 0.75rem;">
+            <i class="fas fa-lock"></i>
+        </div>
+        <h2>Sign In to Your Account</h2>
+        <p>Resume your Linux command line training session</p>
+    </div>
+
+    <form method="POST" action="{{ url_for('auth.login') }}" id="login-form">
+        <div class="form-group">
+            <label for="email"><i class="fas fa-envelope"></i> Gmail / Email Address</label>
+            <input type="email" id="email" name="email" class="form-control" placeholder="user@gmail.com" value="{{ email or '' }}" required autofocus>
+        </div>
+
+        <div class="form-group">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                <label for="password" style="margin-bottom: 0;"><i class="fas fa-key"></i> Password</label>
+                <a href="{{ url_for('auth.forgot_password') }}" style="font-size: 0.8rem; color: var(--accent-cyan);">Forgot Password?</a>
+            </div>
+            <input type="password" id="password" name="password" class="form-control" placeholder="••••••••" required>
+        </div>
+
+        <div class="form-group" style="display: flex; align-items: center; gap: 0.5rem; margin-top: 1rem;">
+            <input type="checkbox" id="remember" name="remember" style="accent-color: var(--accent-emerald);">
+            <label for="remember" style="margin-bottom: 0; font-size: 0.85rem; cursor: pointer; color: var(--text-muted);">Remember this device</label>
+        </div>
+
+        <button type="submit" class="btn btn-primary" id="btn-login-submit" style="width: 100%; margin-top: 1rem; padding: 0.8rem;">
+            <i class="fas fa-sign-in-alt"></i> Sign In to Dashboard
+        </button>
+    </form>
+
+    <div class="auth-footer">
+        Don't have an account yet? <a href="{{ url_for('auth.register') }}" style="font-weight: 600;">Create Account</a>
+    </div>
+</div>
+{% endblock %}

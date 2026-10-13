@@ -1,0 +1,157 @@
+{% extends "base.html" %}
+
+{% block title %}Certification & Competency — Linux Commands Learning Assistant{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 2.5rem;">
+    <h1 style="font-size: 2.25rem; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 0.5rem;">Official Linux Certification</h1>
+    <p style="color: var(--text-muted); font-size: 1rem;">Earn your verifiable Certificate of Competency in Linux Commands and Terminal Operations.</p>
+</div>
+
+<div style="display: grid; grid-template-columns: 1fr 1.15fr; gap: 2rem; align-items: start; margin-bottom: 3.5rem;">
+    <!-- Left Column: Eligibility Criteria Checklist -->
+    <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 2rem; box-shadow: var(--shadow-sm);">
+        <h2 style="font-size: 1.35rem; font-weight: 700; color: var(--text-main); margin-bottom: 1.25rem; display: flex; align-items: center; gap: 0.5rem;">
+            <i class="fas fa-tasks" style="color: var(--accent-emerald);"></i> Eligibility Criteria
+        </h2>
+
+        <p style="font-size: 0.95rem; color: var(--text-sub); line-height: 1.5; margin-bottom: 1.5rem;">
+            Certificates are issued strictly upon demonstrating practical mastery. Complete the required coursework and pass practical assessments to unlock your certificate:
+        </p>
+
+        <!-- Requirement 1 -->
+        <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 1rem 1.25rem; margin-bottom: 1rem; display: flex; align-items: flex-start; gap: 1rem;">
+            <div style="font-size: 1.35rem;" class="{% if eligibility.completion_percentage >= 80.0 %}text-emerald{% else %}text-muted-stat{% endif %}">
+                <i class="fas {% if eligibility.completion_percentage >= 80.0 %}fa-check-circle{% else %}fa-circle{% endif %}"></i>
+            </div>
+            <div style="flex: 1;">
+                <div style="font-weight: 700; color: var(--text-main); margin-bottom: 0.25rem;">
+                    1. Curriculum Completion (Min. 80%)
+                </div>
+                <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.5rem;">
+                    Completed: {{ eligibility.completed_lessons }} of {{ eligibility.total_lessons }} lessons ({{ eligibility.completion_percentage }}%)
+                </div>
+                <div class="progress-bar-wrapper" style="margin: 0; height: 6px;">
+                    <div class="progress-fill" data-progress="{{ eligibility.completion_percentage }}"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Requirement 2 -->
+        <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 1rem 1.25rem; margin-bottom: 1.75rem; display: flex; align-items: flex-start; gap: 1rem;">
+            <div style="font-size: 1.35rem;" class="{% if eligibility.passed_quizzes >= 1 %}text-emerald{% else %}text-muted-stat{% endif %}">
+                <i class="fas {% if eligibility.passed_quizzes >= 1 %}fa-check-circle{% else %}fa-circle{% endif %}"></i>
+            </div>
+            <div>
+                <div style="font-weight: 700; color: var(--text-main); margin-bottom: 0.25rem;">
+                    2. Practical Assessment Examination
+                </div>
+                <div style="font-size: 0.85rem; color: var(--text-muted);">
+                    Passed {{ eligibility.passed_quizzes }} of {{ eligibility.total_quizzes }} required assessments (Minimum 70% passing score).
+                </div>
+            </div>
+        </div>
+
+        <!-- Status & Claim Action -->
+        {% if eligibility.existing_certificate %}
+            <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: var(--radius-sm); padding: 1.25rem; text-align: center;">
+                <div style="font-weight: 700; color: #34d399; font-size: 1.1rem; margin-bottom: 0.5rem;">
+                    <i class="fas fa-check-double"></i> Certificate Officially Issued
+                </div>
+                <p style="font-size: 0.85rem; color: var(--text-sub); margin-bottom: 1rem;">
+                    Your official certificate is verified and ready for download below.
+                </p>
+                <a href="{{ url_for('certificate.download_pdf', cert_id=eligibility.existing_certificate.certificate_id) }}" class="btn btn-primary" style="width: 100%;">
+                    <i class="fas fa-file-pdf"></i> Download Vector PDF Certificate
+                </a>
+            </div>
+        {% elif eligibility.eligible %}
+            <div style="background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: var(--radius-sm); padding: 1.25rem; text-align: center;">
+                <div style="font-weight: 700; color: #38bdf8; font-size: 1.1rem; margin-bottom: 0.5rem;">
+                    <i class="fas fa-unlock"></i> All Criteria Satisfied!
+                </div>
+                <p style="font-size: 0.85rem; color: var(--text-sub); margin-bottom: 1rem;">
+                    Congratulations! You have satisfied all requirements. Click below to issue your certificate.
+                </p>
+                <form method="POST" action="{{ url_for('certificate.issue_certificate') }}">
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">
+                        <i class="fas fa-award"></i> Claim & Issue Official Certificate
+                    </button>
+                </form>
+            </div>
+        {% else %}
+            <div style="background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.25); border-radius: var(--radius-sm); padding: 1.25rem;">
+                <div style="font-weight: 700; color: #fbbf24; font-size: 1rem; margin-bottom: 0.5rem;">
+                    <i class="fas fa-lock"></i> Certification Locked
+                </div>
+                <ul style="font-size: 0.85rem; color: #fde68a; padding-left: 1.25rem; line-height: 1.5;">
+                    {% for req in eligibility.missing_requirements %}
+                        <li>{{ req }}</li>
+                    {% endfor %}
+                </ul>
+                <div style="margin-top: 1rem;">
+                    <a href="{{ url_for('learn.index') }}" class="btn btn-outline" style="width: 100%; font-size: 0.85rem;">
+                        <i class="fas fa-book-open"></i> Continue Lessons to Unlock
+                    </a>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Right Column: Certificate Preview Card -->
+    <div>
+        {% if certificates %}
+            {% for cert in certificates %}
+            <div style="background: linear-gradient(135deg, #0b132b, #1c2541); border: 2px solid var(--accent-emerald); border-radius: var(--radius-lg); padding: 2rem; box-shadow: var(--shadow-lg); position: relative; overflow: hidden;">
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 1rem; margin-bottom: 1.5rem;">
+                    <div style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--accent-emerald); font-weight: 700;">
+                        &gt;_ LINUX LEARNING ASSISTANT
+                    </div>
+                    <span class="badge badge-completed">AUTHENTIC</span>
+                </div>
+
+                <div style="text-align: center; margin-bottom: 1.75rem;">
+                    <div style="font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.35rem;">CERTIFICATE OF MASTERY</div>
+                    <h3 style="font-size: 1.75rem; font-weight: 800; color: #fff; margin-bottom: 0.5rem;">{{ current_user.full_name }}</h3>
+                    <p style="font-size: 0.9rem; color: var(--accent-cyan);">{{ cert.course_name }}</p>
+                </div>
+
+                <div style="background: rgba(0,0,0,0.3); border-radius: var(--radius-sm); padding: 1rem; margin-bottom: 1.5rem; display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; font-size: 0.85rem;">
+                    <div>
+                        <span style="color: var(--text-muted); display: block;">Certificate ID:</span>
+                        <strong style="color: #38bdf8; font-family: var(--font-mono);">{{ cert.certificate_id }}</strong>
+                    </div>
+                    <div>
+                        <span style="color: var(--text-muted); display: block;">Issue Date:</span>
+                        <strong style="color: #fff;">{{ cert.issue_date.strftime('%B %d, %Y') }}</strong>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+                    <a href="{{ url_for('certificate.download_pdf', cert_id=cert.certificate_id) }}" class="btn btn-primary" style="flex: 1;">
+                        <i class="fas fa-file-pdf"></i> Download PDF
+                    </a>
+                    <a href="{{ url_for('certificate.verify_public', cert_id=cert.certificate_id) }}" target="_blank" class="btn btn-outline" style="flex: 1;">
+                        <i class="fas fa-external-link-alt"></i> Verify Online
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <!-- Locked Certificate Preview Card -->
+            <div style="background: var(--bg-card); border: 1px dashed var(--border-color); border-radius: var(--radius-lg); padding: 3rem 2rem; text-align: center; color: var(--text-muted);">
+                <div style="width: 72px; height: 72px; border-radius: 50%; background: var(--bg-secondary); color: #64748b; display: inline-flex; align-items: center; justify-content: center; font-size: 2rem; margin-bottom: 1.25rem;">
+                    <i class="fas fa-certificate"></i>
+                </div>
+                <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--text-main); margin-bottom: 0.5rem;">Your Certificate Preview</h3>
+                <p style="font-size: 0.9rem; line-height: 1.5; max-width: 380px; margin: 0 auto 1.5rem;">
+                    Once unlocked, your high-resolution vector PDF certificate will be generated with a cryptographic ID and permanent public verification URL.
+                </p>
+                <div style="font-family: var(--font-mono); font-size: 0.8rem; color: #64748b;">
+                    Format: ReportLab Vector PDF (Landscape 11" x 8.5")
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

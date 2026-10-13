@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+
+{% block title %}Learn Linux Commands — Interactive Curriculum{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+    <div>
+        <h1 style="font-size: 2.25rem; font-weight: 800; letter-spacing: -0.02em;">Linux Command Learning Tracks</h1>
+        <p style="color: var(--text-muted); font-size: 1rem;">Choose a lesson to enter the interactive terminal simulation environment.</p>
+    </div>
+
+    <div>
+        <a href="{{ url_for('learn.continue_learning') }}" class="btn btn-primary" id="btn-continue-learning-top">
+            <i class="fas fa-play"></i> Continue Where You Stopped
+        </a>
+    </div>
+</div>
+
+<!-- Progress Banner -->
+<div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 1.5rem; margin-bottom: 2.5rem;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+        <span style="font-weight: 600; color: var(--text-sub);">Curriculum Progress: {{ overview.completed_count }} / {{ overview.total_lessons }} Completed</span>
+        <span style="font-weight: 700; color: var(--accent-emerald); font-family: var(--font-mono);">{{ overview.completion_percentage }}%</span>
+    </div>
+    <div class="progress-bar-wrapper" style="margin-bottom: 0;">
+        <div class="progress-fill" data-progress="{{ overview.completion_percentage }}"></div>
+    </div>
+</div>
+
+<!-- Track 1: Beginner Level -->
+<div style="margin-bottom: 3rem;">
+    <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem;">
+        <span class="badge badge-beginner" style="font-size: 0.85rem; padding: 0.35rem 0.8rem;">Level 1</span>
+        <h2 style="font-size: 1.5rem; font-weight: 700; color: var(--text-main);">Beginner Foundations</h2>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.25rem;">
+        {% for l in beginner_lessons %}
+        <a href="{{ url_for('learn.lesson_detail', slug=l.lesson_slug) }}" class="lesson-card lesson-card-beginner">
+            <div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                    <span style="font-family: var(--font-mono); font-weight: 700; color: #34d399; font-size: 1.1rem;">{{ l.command_name }}</span>
+                    {% if l.id in completed_ids %}
+                        <span class="badge badge-completed"><i class="fas fa-check"></i> Done</span>
+                    {% else %}
+                        <span style="font-size: 0.75rem; color: #64748b;">Lesson #{{ l.lesson_order }}</span>
+                    {% endif %}
+                </div>
+                <h3 style="font-size: 1rem; font-weight: 600; color: var(--text-main); margin-bottom: 0.4rem;">{{ l.title }}</h3>
+                <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                    {{ l.purpose }}
+                </p>
+            </div>
+            <div style="margin-top: 1rem; font-size: 0.8rem; color: var(--accent-cyan); display: flex; align-items: center; gap: 0.35rem;">
+                <span>Start Simulation</span> <i class="fas fa-arrow-right"></i>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Track 2: Intermediate Level -->
+<div style="margin-bottom: 3rem;">
+    <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem;">
+        <span class="badge badge-intermediate" style="font-size: 0.85rem; padding: 0.35rem 0.8rem;">Level 2</span>
+        <h2 style="font-size: 1.5rem; font-weight: 700; color: var(--text-main);">Intermediate Sysadmin & Operations</h2>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.25rem;">
+        {% for l in intermediate_lessons %}
+        <a href="{{ url_for('learn.lesson_detail', slug=l.lesson_slug) }}" class="lesson-card lesson-card-intermediate">
+            <div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                    <span style="font-family: var(--font-mono); font-weight: 700; color: #38bdf8; font-size: 1.1rem;">{{ l.command_name }}</span>
+                    {% if l.id in completed_ids %}
+                        <span class="badge badge-completed"><i class="fas fa-check"></i> Done</span>
+                    {% else %}
+                        <span style="font-size: 0.75rem; color: #64748b;">Lesson #{{ l.lesson_order }}</span>
+                    {% endif %}
+                </div>
+                <h3 style="font-size: 1rem; font-weight: 600; color: var(--text-main); margin-bottom: 0.4rem;">{{ l.title }}</h3>
+                <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                    {{ l.purpose }}
+                </p>
+            </div>
+            <div style="margin-top: 1rem; font-size: 0.8rem; color: var(--accent-cyan); display: flex; align-items: center; gap: 0.35rem;">
+                <span>Start Simulation</span> <i class="fas fa-arrow-right"></i>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Track 3: Advanced Level -->
+<div style="margin-bottom: 3rem;">
+    <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem;">
+        <span class="badge badge-advanced" style="font-size: 0.85rem; padding: 0.35rem 0.8rem;">Level 3</span>
+        <h2 style="font-size: 1.5rem; font-weight: 700; color: var(--text-main);">Advanced Networking, Scripting & Pipelines</h2>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.25rem;">
+        {% for l in advanced_lessons %}
+        <a href="{{ url_for('learn.lesson_detail', slug=l.lesson_slug) }}" class="lesson-card lesson-card-advanced">
+            <div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                    <span style="font-family: var(--font-mono); font-weight: 700; color: #c084fc; font-size: 1.1rem;">{{ l.command_name }}</span>
+                    {% if l.id in completed_ids %}
+                        <span class="badge badge-completed"><i class="fas fa-check"></i> Done</span>
+                    {% else %}
+                        <span style="font-size: 0.75rem; color: #64748b;">Lesson #{{ l.lesson_order }}</span>
+                    {% endif %}
+                </div>
+                <h3 style="font-size: 1rem; font-weight: 600; color: var(--text-main); margin-bottom: 0.4rem;">{{ l.title }}</h3>
+                <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                    {{ l.purpose }}
+                </p>
+            </div>
+            <div style="margin-top: 1rem; font-size: 0.8rem; color: var(--accent-cyan); display: flex; align-items: center; gap: 0.35rem;">
+                <span>Start Simulation</span> <i class="fas fa-arrow-right"></i>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

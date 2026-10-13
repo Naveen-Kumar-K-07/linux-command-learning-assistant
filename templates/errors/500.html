@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block title %}500 — Server Error | Linux Commands Learning Assistant{% endblock %}
+
+{% block content %}
+<div style="max-width: 540px; margin: 4rem auto; text-align: center;">
+    <div style="font-family: var(--font-mono); font-size: 5rem; font-weight: 800; color: var(--accent-amber); line-height: 1; margin-bottom: 1rem;">
+        500
+    </div>
+    <h1 style="font-size: 1.75rem; font-weight: 700; margin-bottom: 0.75rem;">Internal Kernel Error</h1>
+    <p style="color: var(--text-muted); font-size: 1rem; margin-bottom: 2rem;">
+        An unexpected condition occurred while processing the request.
+    </p>
+    <a href="{{ url_for('landing') }}" class="btn btn-primary">
+        <i class="fas fa-home"></i> Return to Homepage
+    </a>
+</div>
+{% endblock %}

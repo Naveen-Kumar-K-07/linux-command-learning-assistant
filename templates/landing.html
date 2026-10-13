@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+
+{% block title %}Linux Commands Learning Assistant — Master the Command Line{% endblock %}
+
+{% block content %}
+<div class="landing-hero" style="text-align: center; padding: 3rem 1rem 2rem;">
+    <div style="display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); padding: 0.35rem 1rem; border-radius: var(--radius-full); margin-bottom: 1.5rem; font-size: 0.85rem; color: #34d399; font-weight: 600;">
+        <i class="fas fa-terminal"></i> Interactive Linux Simulation Platform
+    </div>
+    
+    <h1 style="font-size: 3rem; font-weight: 800; letter-spacing: -0.03em; max-width: 850px; margin: 0 auto 1.25rem; line-height: 1.2;">
+        Master Linux Commands Through <span style="background: linear-gradient(135deg, #10b981, #38bdf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Interactive Simulation</span>
+    </h1>
+
+    <p style="font-size: 1.15rem; color: var(--text-muted); max-width: 680px; margin: 0 auto 2.5rem; line-height: 1.6;">
+        Stop memorizing commands from static cheat sheets. Practice in a realistic virtual Linux terminal with a live filesystem, step-by-step visual execution feedback, practical quizzes, and verifiable certifications.
+    </p>
+
+    <div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; margin-bottom: 3.5rem;">
+        <a href="{{ url_for('auth.register') }}" class="btn btn-primary" id="hero-cta-register" style="padding: 0.85rem 2rem; font-size: 1.05rem;">
+            <i class="fas fa-rocket"></i> Get Started Free
+        </a>
+        <a href="{{ url_for('auth.login') }}" class="btn btn-outline" id="hero-cta-login" style="padding: 0.85rem 1.75rem; font-size: 1.05rem;">
+            <i class="fas fa-sign-in-alt"></i> Existing Student Login
+        </a>
+    </div>
+
+    <!-- Live Preview Interactive Terminal Mockup -->
+    <div style="max-width: 780px; margin: 0 auto 4rem; text-align: left;">
+        <div class="terminal-window">
+            <div class="terminal-titlebar">
+                <div class="terminal-dots">
+                    <span class="dot dot-red"></span>
+                    <span class="dot dot-yellow"></span>
+                    <span class="dot dot-green"></span>
+                </div>
+                <div class="terminal-title"><i class="fas fa-terminal"></i> bash — guest@linux-assistant:~</div>
+                <div style="font-size: 0.75rem; color: #64748b;">Preview Sandbox</div>
+            </div>
+            <div class="terminal-body" style="height: 250px;">
+                <div class="term-entry">
+                    <div class="term-prompt-line">
+                        <span class="prompt-user">guest</span><span class="prompt-at">@</span><span class="prompt-host">linux-assistant</span><span class="prompt-colon">:</span><span class="prompt-path">~</span><span class="prompt-symbol">$</span>
+                        <span>pwd</span>
+                    </div>
+                    <div class="term-output">/home/guest</div>
+                </div>
+                <div class="term-entry">
+                    <div class="term-prompt-line">
+                        <span class="prompt-user">guest</span><span class="prompt-at">@</span><span class="prompt-host">linux-assistant</span><span class="prompt-colon">:</span><span class="prompt-path">~</span><span class="prompt-symbol">$</span>
+                        <span>mkdir -p projects/web && cd projects/web && touch index.html</span>
+                    </div>
+                </div>
+                <div class="term-entry">
+                    <div class="term-prompt-line">
+                        <span class="prompt-user">guest</span><span class="prompt-at">@</span><span class="prompt-host">linux-assistant</span><span class="prompt-colon">:</span><span class="prompt-path">~/projects/web</span><span class="prompt-symbol">$</span>
+                        <span>ls -la</span>
+                    </div>
+                    <div class="term-output">total 12
+drwxr-xr-x 2 guest guest 4096 Oct 13 12:00 .
+drwxr-xr-x 3 guest guest 4096 Oct 13 12:00 ..
+-rw-r--r-- 1 guest guest    0 Oct 13 12:00 index.html</div>
+                </div>
+                <div class="term-entry">
+                    <div class="term-prompt-line">
+                        <span class="prompt-user">guest</span><span class="prompt-at">@</span><span class="prompt-host">linux-assistant</span><span class="prompt-colon">:</span><span class="prompt-path">~/projects/web</span><span class="prompt-symbol">$</span>
+                        <span style="color: #10b981;">echo "Sign up to execute live commands in your own isolated filesystem!"</span>
+                    </div>
+                    <div class="term-output" style="color: #38bdf8;">Sign up to execute live commands in your own isolated filesystem!</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Features Section -->
+<div style="margin-bottom: 4rem;">
+    <div style="text-align: center; margin-bottom: 2.5rem;">
+        <h2 style="font-size: 2rem; font-weight: 700; margin-bottom: 0.5rem;">Engineered for Real Practical Competency</h2>
+        <p style="color: var(--text-muted); font-size: 1rem;">Everything you need to go from command-line novice to sysadmin professional.</p>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.5rem;">
+        <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 1.75rem; transition: transform 0.2s ease;">
+            <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(16, 185, 129, 0.15); color: #34d399; display: flex; align-items: center; justify-content: center; font-size: 1.35rem; margin-bottom: 1.25rem;">
+                <i class="fas fa-terminal"></i>
+            </div>
+            <h3 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 0.5rem;">Live Terminal Simulator</h3>
+            <p style="color: var(--text-muted); font-size: 0.9rem; line-height: 1.5;">
+                Fully functional virtual filesystem engine executing commands safely in real time without risky host system calls.
+            </p>
+        </div>
+
+        <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 1.75rem;">
+            <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(56, 189, 248, 0.15); color: #38bdf8; display: flex; align-items: center; justify-content: center; font-size: 1.35rem; margin-bottom: 1.25rem;">
+                <i class="fas fa-sitemap"></i>
+            </div>
+            <h3 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 0.5rem;">Visual State Inspector</h3>
+            <p style="color: var(--text-muted); font-size: 0.9rem; line-height: 1.5;">
+                Watch file trees, directories, and permission changes update dynamically as you run commands like mkdir, rm, and chmod.
+            </p>
+        </div>
+
+        <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 1.75rem;">
+            <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(245, 158, 11, 0.15); color: #fbbf24; display: flex; align-items: center; justify-content: center; font-size: 1.35rem; margin-bottom: 1.25rem;">
+                <i class="fas fa-database"></i>
+            </div>
+            <h3 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 0.5rem;">Persistent Progress</h3>
+            <p style="color: var(--text-muted); font-size: 0.9rem; line-height: 1.5;">
+                Every command, practice task, and lesson checkpoint is saved in MySQL. Resume seamlessly across any device anytime.
+            </p>
+        </div>
+
+        <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 1.75rem;">
+            <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(168, 85, 247, 0.15); color: #c084fc; display: flex; align-items: center; justify-content: center; font-size: 1.35rem; margin-bottom: 1.25rem;">
+                <i class="fas fa-award"></i>
+            </div>
+            <h3 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 0.5rem;">Official PDF Certificates</h3>
+            <p style="color: var(--text-muted); font-size: 0.9rem; line-height: 1.5;">
+                Pass assessments and claim cryptographic, downloadable PDF certificates featuring unique verifiable certificate IDs.
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

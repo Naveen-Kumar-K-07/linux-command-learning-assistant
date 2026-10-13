@@ -1,0 +1,237 @@
+{% extends "base.html" %}
+
+{% block title %}{{ lesson.command_name }} — {{ lesson.title }} | Linux Commands Learning Assistant{% endblock %}
+
+{% block content %}
+<!-- Top Lesson Breadcrumb & Nav Controls -->
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+    <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; color: var(--text-muted);">
+        <a href="{{ url_for('learn.index') }}"><i class="fas fa-th-list"></i> All Lessons</a>
+        <span>/</span>
+        <span style="color: var(--text-sub);">{{ lesson.category }}</span>
+        <span>/</span>
+        <strong style="color: var(--accent-emerald);">{{ lesson.command_name }}</strong>
+    </div>
+
+    <div style="display: flex; align-items: center; gap: 0.75rem;">
+        {% if prev_lesson %}
+            <a href="{{ url_for('learn.lesson_detail', slug=prev_lesson.lesson_slug) }}" class="btn btn-outline" style="padding: 0.45rem 0.85rem; font-size: 0.85rem;">
+                <i class="fas fa-chevron-left"></i> Prev: {{ prev_lesson.command_name }}
+            </a>
+        {% endif %}
+
+        <div id="lesson-status-badge">
+            {% if is_completed or practice_completed %}
+                <span class="badge badge-completed" style="font-size: 0.85rem; padding: 0.45rem 0.95rem; display: inline-flex; align-items: center; gap: 0.45rem;">
+                    <i class="fas fa-check-circle"></i> Lesson Completed
+                </span>
+            {% else %}
+                <span class="badge" style="background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); font-size: 0.85rem; padding: 0.45rem 0.95rem; display: inline-flex; align-items: center; gap: 0.45rem;" title="Complete the interactive practice challenge below to automatically finish this lesson">
+                    <i class="fas fa-tasks"></i> Complete Practice to Finish
+                </span>
+            {% endif %}
+        </div>
+
+        {% if next_lesson %}
+            <a href="{{ url_for('learn.lesson_detail', slug=next_lesson.lesson_slug) }}" class="btn btn-primary" style="padding: 0.45rem 0.85rem; font-size: 0.85rem;">
+                Next: {{ next_lesson.command_name }} <i class="fas fa-chevron-right"></i>
+            </a>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Dual Pane Main Layout -->
+<div class="lesson-layout">
+    <!-- LEFT PANE: In-depth Lesson Documentation -->
+    <div class="lesson-doc-pane">
+        <!-- 1. Command Name & Metadata -->
+        <div class="lesson-header-meta">
+            <div>
+                <span class="command-pill">{{ lesson.command_name }}</span>
+            </div>
+            <div style="display: flex; gap: 0.5rem;">
+                <span class="badge {% if lesson.difficulty_level == 'Beginner' %}badge-beginner{% elif lesson.difficulty_level == 'Intermediate' %}badge-intermediate{% else %}badge-advanced{% endif %}">
+                    {{ lesson.difficulty_level }}
+                </span>
+                <span class="badge" style="background: rgba(255,255,255,0.06); color: var(--text-muted); border: 1px solid var(--border-color);">
+                    {{ lesson.category }}
+                </span>
+            </div>
+        </div>
+
+        <div class="lesson-title-area">
+            <h1>{{ lesson.title }}</h1>
+        </div>
+
+        <!-- 2. Purpose -->
+        <div class="section-block" style="margin-top: 1rem; border-top: none; padding-top: 0;">
+            <h3><i class="fas fa-bullseye"></i> Purpose</h3>
+            <p style="font-size: 1rem; color: var(--text-sub); line-height: 1.6;">
+                {{ lesson.purpose }}
+            </p>
+        </div>
+
+        <!-- 3. Syntax -->
+        <div class="section-block">
+            <h3><i class="fas fa-code"></i> Command Syntax</h3>
+            <div class="code-box">
+                {{ lesson.syntax }}
+            </div>
+        </div>
+
+        <!-- 4. Explanation -->
+        <div class="section-block">
+            <h3><i class="fas fa-book-reader"></i> Beginner-Friendly Explanation</h3>
+            <p style="font-size: 0.95rem; color: var(--text-sub); line-height: 1.6;">
+                {{ lesson.explanation }}
+            </p>
+        </div>
+
+        <!-- 5. Practical Examples -->
+        <div class="section-block">
+            <h3><i class="fas fa-lightbulb"></i> Practical Examples</h3>
+            {% for ex in lesson.get_examples() %}
+            <div class="example-card">
+                <div class="example-header">
+                    <span>{{ ex.desc }}</span>
+                    <button type="button" class="btn-copy-cmd" data-cmd="{{ ex.command }}">
+                        <i class="fas fa-copy"></i> Run in Terminal
+                    </button>
+                </div>
+                <div class="code-box" style="padding: 0.6rem 0.8rem; font-size: 0.88rem;">
+                    $ {{ ex.command }}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- 6. Expected Output -->
+        <div class="section-block">
+            <h3><i class="fas fa-desktop"></i> Expected Output</h3>
+            <div class="code-box" style="color: #cbd5e1; background: #070b14;">
+                <pre style="margin: 0; font-family: inherit;">{{ lesson.expected_output }}</pre>
+            </div>
+        </div>
+
+        <!-- 9. Step-by-Step Explanation -->
+        <div class="section-block">
+            <h3><i class="fas fa-list-ol"></i> Step-by-Step Execution Breakdown</h3>
+            <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 1rem; font-size: 0.9rem; color: var(--text-sub); line-height: 1.6; white-space: pre-line;">
+                {{ lesson.step_by_step }}
+            </div>
+        </div>
+
+        <!-- 10. Common Mistakes -->
+        <div class="section-block">
+            <h3 style="color: #fbbf24;"><i class="fas fa-exclamation-triangle" style="color: #fbbf24;"></i> Common Pitfalls & Mistakes</h3>
+            <div style="background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: var(--radius-sm); padding: 1rem; font-size: 0.9rem; color: #fde68a; line-height: 1.6; white-space: pre-line;">
+                {{ lesson.common_mistakes }}
+            </div>
+        </div>
+
+        <!-- 11. Practice Task -->
+        <div class="practice-card" id="practice-task-container">
+            <h4><i class="fas fa-flag-checkered"></i> Interactive Practice Challenge</h4>
+            <p style="font-size: 0.95rem; color: var(--text-main); line-height: 1.5; margin-bottom: 0.75rem;">
+                {{ lesson.practice_task }}
+            </p>
+            <div class="practice-status">
+                <span id="practice-status-badge">
+                    {% if practice_completed or is_completed %}
+                        <span class="badge badge-completed"><i class="fas fa-check-circle"></i> Challenge Completed!</span>
+                    {% else %}
+                        <span class="badge" style="background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3);">
+                            <i class="fas fa-hourglass-half"></i> Awaiting Execution
+                        </span>
+                    {% endif %}
+                </span>
+                <span style="font-size: 0.8rem; color: var(--text-muted);">
+                    Type and execute the target command in the simulator to auto-complete this lesson.
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- RIGHT PANE: Interactive Linux Terminal Simulator & Visual Inspector -->
+    <div class="terminal-simulator-pane">
+        <!-- 7. Interactive Linux Terminal Simulator -->
+        <div class="terminal-window" id="terminal-container">
+            <div class="terminal-titlebar">
+                <div class="terminal-dots">
+                    <span class="dot dot-red"></span>
+                    <span class="dot dot-yellow"></span>
+                    <span class="dot dot-green"></span>
+                </div>
+                <div class="terminal-title">
+                    <i class="fas fa-terminal"></i> bash — <span id="term-current-path">/home/user</span>
+                </div>
+                <div class="terminal-controls">
+                    <button type="button" class="btn-term-action" id="btn-clear-term" title="Clear terminal screen">
+                        <i class="fas fa-eraser"></i> Clear
+                    </button>
+                    <button type="button" class="btn-term-action" id="btn-reset-term" title="Reset virtual filesystem to default">
+                        <i class="fas fa-undo"></i> Reset VFS
+                    </button>
+                </div>
+            </div>
+
+            <!-- Terminal Screen Body -->
+            <div class="terminal-body" id="terminal-body">
+                <div class="terminal-history" id="terminal-history">
+                    <div class="term-entry">
+                        <div class="term-output" style="color: #64748b;">
+                            Linux Commands Learning Assistant — Sandbox v2.4 (Ubuntu 24.04 LTS)
+                            Type Linux commands below. Commands persist to your personal virtual filesystem.
+                            Type 'help' to view supported commands or 'clear' to clear this screen.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Terminal Input Prompt -->
+            <div class="terminal-input-bar">
+                <div class="term-prompt-line" style="margin-bottom: 0;">
+                    <span class="prompt-user">user</span><span class="prompt-at">@</span><span class="prompt-host">linux-assistant</span><span class="prompt-colon">:</span><span class="prompt-path" id="prompt-path">~</span><span class="prompt-symbol">$</span>
+                </div>
+                <input type="text" id="term-input" class="term-input-field" placeholder="type command (e.g. {{ lesson.command_name }})..." data-lesson-id="{{ lesson.id }}" autocomplete="off" spellcheck="false" autofocus>
+                <button type="button" class="btn btn-primary" id="btn-execute" style="padding: 0.4rem 0.85rem; font-size: 0.8rem;">
+                    <i class="fas fa-play"></i> Run
+                </button>
+            </div>
+        </div>
+
+        <!-- 8. Visual Simulation & State Inspector -->
+        <div class="inspector-card">
+            <div class="inspector-tabs">
+                <button type="button" class="inspector-tab active" data-target="pane-vfs">
+                    <i class="fas fa-folder-tree"></i> Live Filesystem Tree
+                </button>
+                <button type="button" class="inspector-tab" data-target="pane-changes">
+                    <i class="fas fa-history"></i> Execution Telemetry & Changes
+                </button>
+            </div>
+
+            <div class="inspector-content">
+                <!-- Tab 1: Virtual Filesystem Live Tree -->
+                <div id="pane-vfs" class="inspector-pane" style="display: block;">
+                    <div id="vfs-tree-container">
+                        <div style="color: #64748b; font-size: 0.85rem;">Loading filesystem tree...</div>
+                    </div>
+                </div>
+
+                <!-- Tab 2: Visual Changes & State Mutations -->
+                <div id="pane-changes" class="inspector-pane" style="display: none;">
+                    <div id="visual-changes-container">
+                        <span style="color: #64748b;">No recent filesystem changes recorded yet. Execute commands above!</span>
+                    </div>
+                    <div id="explanation-container" style="margin-top: 0.75rem;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/terminal.js') }}"></script>
+{% endblock %}
