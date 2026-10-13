@@ -33,6 +33,7 @@
                 {% if current_user.is_authenticated %}
                     <li class="nav-item"><a href="{{ url_for('dashboard.index') }}" id="nav-dash"><i class="fas fa-th-large"></i> Dashboard</a></li>
                     <li class="nav-item"><a href="{{ url_for('learn.index') }}" id="nav-learn"><i class="fas fa-terminal"></i> Learn</a></li>
+                    <li class="nav-item"><a href="{{ url_for('code.index') }}" id="nav-code"><i class="fas fa-code"></i> Code</a></li>
                     <li class="nav-item"><a href="{{ url_for('assessment.index') }}" id="nav-assessment"><i class="fas fa-tasks"></i> Assessment</a></li>
                     <li class="nav-item"><a href="{{ url_for('certificate.index') }}" id="nav-cert"><i class="fas fa-award"></i> Certification</a></li>
                     <li class="nav-item">

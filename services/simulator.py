@@ -274,8 +274,17 @@ class VirtualLinuxSimulator:
         if not tokens:
             return {"command": raw, "output": "", "status": "success", "cwd": self.cwd, "vfs": self.vfs}
 
-        cmd = tokens[0].lower()
+        cmd_raw = tokens[0]
+        cmd = cmd_raw.lower()
         args = tokens[1:]
+
+        # Handle direct script/executable invocation: ./script.sh, /path/to/script, or script.sh in cwd
+        if cmd_raw.startswith("./") or cmd_raw.startswith("/") or cmd.endswith(".sh") or cmd.endswith(".py"):
+            res = self._execute_script_file(cmd_raw, args)
+            res["command"] = raw
+            res["cwd"] = self.cwd
+            res["vfs"] = self.vfs
+            return res
 
         # Dispatch
         handler_map = {
@@ -315,6 +324,10 @@ class VirtualLinuxSimulator:
             "apt": self._cmd_apt,
             "apt-get": self._cmd_apt,
             "dpkg": self._cmd_dpkg,
+            "bash": self._cmd_bash,
+            "sh": self._cmd_bash,
+            "python": self._cmd_python,
+            "python3": self._cmd_python,
             "clear": self._cmd_clear,
             "help": self._cmd_help,
             "history": self._cmd_history,
@@ -1203,3 +1216,136 @@ class VirtualLinuxSimulator:
             "visual_changes": [],
             "explanation": f"Pipeline (|) successfully piped stdout of initial process into stdin of subsequent filter command(s)."
         }
+
+    def _execute_script_file(self, target_cmd, args):
+        clean_target = target_cmd
+        if clean_target.startswith("./"):
+            clean_target = clean_target[2:]
+
+        abs_path = self.normalize_path(clean_target)
+        node = self.get_node(abs_path)
+
+        if not node:
+            return {
+                "output": f"bash: {target_cmd}: No such file or directory",
+                "status": "error",
+                "visual_changes": [],
+                "explanation": f"The executable file '{target_cmd}' was not found in the virtual filesystem."
+            }
+
+        if node.get("type") == "dir":
+            return {
+                "output": f"bash: {target_cmd}: Is a directory",
+                "status": "error",
+                "visual_changes": [],
+                "explanation": f"'{target_cmd}' is a directory, not an executable file."
+            }
+
+        perms = node.get("perms", "rw-r--r--")
+        is_executable = "x" in perms
+        if not is_executable:
+            return {
+                "output": f"bash: {target_cmd}: Permission denied\n[Hint] In Linux, files require executable permissions to run.\nRun 'chmod +x {clean_target}' or click 'Make Executable' before running.",
+                "status": "error",
+                "visual_changes": [],
+                "explanation": f"Permission denied: '{clean_target}' has permissions '{perms}', which lacks execute rights ('x')."
+            }
+
+        content = node.get("content", "")
+        return self._run_script_content(clean_target, content, args)
+
+    def _run_script_content(self, filename, content, args):
+        lines = content.split("\n")
+        first_line = lines[0].strip() if lines else ""
+        is_python = filename.endswith(".py") or "python" in first_line
+
+        changes = [f"Executed '{filename}'"]
+
+        if is_python:
+            try:
+                import io, contextlib
+                f = io.StringIO()
+                with contextlib.redirect_stdout(f):
+                    safe_globals = {
+                        "__builtins__": {
+                            "print": print, "range": range, "len": len, "str": str,
+                            "int": int, "float": float, "list": list, "dict": dict,
+                            "set": set, "bool": bool, "sum": sum, "min": min, "max": max,
+                            "enumerate": enumerate, "zip": zip, "sorted": sorted
+                        }
+                    }
+                    exec(content, safe_globals)
+                py_out = f.getvalue().strip()
+                return {
+                    "output": py_out if py_out else "(program finished with no output)",
+                    "status": "success",
+                    "visual_changes": changes,
+                    "explanation": f"Executed Python script '{filename}' in virtual sandbox."
+                }
+            except Exception as e:
+                return {
+                    "output": f"Traceback (most recent call last):\n  File \"{filename}\", line 1\n{type(e).__name__}: {e}",
+                    "status": "error",
+                    "visual_changes": changes,
+                    "explanation": f"Python runtime error: {e}"
+                }
+
+        # Shell script execution line-by-line
+        output_lines = []
+        var_store = {}
+        for line in lines:
+            line_str = line.strip()
+            if not line_str or line_str.startswith("#"):
+                continue
+
+            if "=" in line_str and not any(line_str.startswith(c) for c in ["echo", "chmod", "cat", "mkdir", "touch", "rm", "cp", "mv", "grep", "find"]):
+                parts = line_str.split("=", 1)
+                v_name = parts[0].strip()
+                v_val = parts[1].strip().strip('"').strip("'")
+                var_store[v_name] = v_val
+                continue
+
+            for k, v in var_store.items():
+                line_str = line_str.replace(f"${k}", v).replace(f"${{{k}}}", v)
+
+            sub_res = self.execute(line_str)
+            if sub_res.get("output"):
+                output_lines.append(sub_res["output"])
+            if sub_res.get("visual_changes"):
+                changes.extend(sub_res["visual_changes"])
+
+        final_out = "\n".join(output_lines)
+        return {
+            "output": final_out if final_out else "(script completed with no output)",
+            "status": "success",
+            "visual_changes": changes,
+            "explanation": f"Executed shell script '{filename}'."
+        }
+
+    def _cmd_bash(self, args):
+        if not args:
+            return {"output": "GNU bash, version 5.2.21(1)-release (x86_64-pc-linux-gnu)", "status": "success", "visual_changes": [], "explanation": "bash interactive info."}
+
+        target = args[0]
+        abs_path = self.normalize_path(target)
+        node = self.get_node(abs_path)
+        if not node or node.get("type") != "file":
+            return {"output": f"bash: {target}: No such file or directory", "status": "error", "visual_changes": [], "explanation": "Script not found."}
+
+        return self._run_script_content(target, node.get("content", ""), args[1:])
+
+    def _cmd_python(self, args):
+        if not args:
+            return {"output": "Python 3.12.0 (main, Oct 2026)\nType \"help\", \"copyright\", \"credits\" or \"license\" for more information.", "status": "success", "visual_changes": [], "explanation": "Python interactive info."}
+
+        if args[0] == "-c" and len(args) > 1:
+            code = args[1]
+            return self._run_script_content("inline.py", code, [])
+
+        target = args[0]
+        abs_path = self.normalize_path(target)
+        node = self.get_node(abs_path)
+        if not node or node.get("type") != "file":
+            return {"output": f"python: can't open file '{target}': [Errno 2] No such file or directory", "status": "error", "visual_changes": [], "explanation": "Python script not found."}
+
+        return self._run_script_content(target, node.get("content", ""), args[1:])

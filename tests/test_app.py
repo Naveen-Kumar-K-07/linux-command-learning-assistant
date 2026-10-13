@@ -317,5 +317,58 @@ class LinuxAssistantTestCase(unittest.TestCase):
         self.assertIn(lesson.id, overview['completed_lesson_ids'])
         self.assertGreaterEqual(overview['completed_count'], 1)
 
+    # -------------------------------------------------------------
+    # 7. Code Studio & Executable Runner Tests
+    # -------------------------------------------------------------
+    def test_code_studio_and_executable_runner(self):
+        user = User(full_name='Dev User', email='dev_user@gmail.com')
+        user.set_password('pass123')
+        db.session.add(user)
+        db.session.commit()
+
+        self.client.post('/login', data={'email': 'dev_user@gmail.com', 'password': 'pass123'})
+
+        # 1. Access code studio page
+        resp_code = self.client.get('/code')
+        self.assertEqual(resp_code.status_code, 200)
+
+        # 2. Save a new shell script without execute permissions
+        script_content = '#!/bin/bash\necho "Script executed successfully!"\nmkdir -p generated_dir\n'
+        resp_save = self.client.post('/api/code/file/save', json={
+            'path': 'run_test.sh',
+            'content': script_content,
+            'make_executable': False
+        })
+        self.assertEqual(resp_save.status_code, 200)
+        self.assertFalse(resp_save.get_json()['is_executable'])
+
+        # 3. Try to run ./run_test.sh without +x -> should fail with Permission denied
+        resp_run_denied = self.client.post('/api/code/run', json={
+            'path': 'run_test.sh',
+            'run_type': 'executable'
+        })
+        self.assertEqual(resp_run_denied.status_code, 200)
+        data_denied = resp_run_denied.get_json()
+        self.assertEqual(data_denied['status'], 'error')
+        self.assertIn('Permission denied', data_denied['output'])
+
+        # 4. Grant chmod +x executable permission
+        resp_chmod = self.client.post('/api/code/file/chmod', json={
+            'path': 'run_test.sh',
+            'executable': True
+        })
+        self.assertEqual(resp_chmod.status_code, 200)
+        self.assertTrue(resp_chmod.get_json()['is_executable'])
+
+        # 5. Now execute ./run_test.sh -> should succeed and create the directory
+        resp_run_ok = self.client.post('/api/code/run', json={
+            'path': 'run_test.sh',
+            'run_type': 'executable'
+        })
+        self.assertEqual(resp_run_ok.status_code, 200)
+        data_ok = resp_run_ok.get_json()
+        self.assertEqual(data_ok['status'], 'success')
+        self.assertIn('Script executed successfully!', data_ok['output'])
+
 if __name__ == '__main__':
     unittest.main()

@@ -3,7 +3,7 @@ from flask import Flask, render_template, redirect, url_for
 from flask_login import LoginManager, current_user
 from config import Config
 from models import db, User
-from routes import auth_bp, dashboard_bp, learn_bp, terminal_bp, assessment_bp, certificate_bp
+from routes import auth_bp, dashboard_bp, learn_bp, terminal_bp, assessment_bp, certificate_bp, code_bp
 from database.seed_data import seed_curriculum
 
 def create_app(config_class=Config):
@@ -30,6 +30,7 @@ def create_app(config_class=Config):
     app.register_blueprint(terminal_bp)
     app.register_blueprint(assessment_bp)
     app.register_blueprint(certificate_bp)
+    app.register_blueprint(code_bp)
 
     # Landing page route
     @app.route('/')
